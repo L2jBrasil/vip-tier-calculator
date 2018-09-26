@@ -1,5 +1,4 @@
-window.onload=function(){
-            var app = angular.module('app', []);
+var app = angular.module('app', []);
             app.controller('testController', ['$scope', '$http', '$timeout',  function($scope, $http, $timeout) {
                 
 				var $ctrl = this;
@@ -66,5 +65,39 @@ window.onload=function(){
                 //Init:
                 $scope.calculateTier($scope.months);
             }]);
-	    angular.bootstrap(document, ['app']);
+
+function domReady(fn) {
+        if (document.readyState != 'loading') {
+            fn(document);
+        } else if (document.addEventListener) {
+            document.addEventListener('DOMContentLoaded', function () {
+                fn(document)
+            });
+        } else {
+            document.attachEvent('onreadystatechange', function () {
+                if (document.readyState != 'loading') {
+                    fn(document);
+                }
+            });
         }
+    }
+    function appBootstrapFn(document) {
+        try {
+            angular.bootstrap(document, ['app'], {
+                strictDi: true
+            });
+            return angular.resumeBootstrap();
+        } catch (e) {
+            var keepconsole = console;
+            keepconsole.warn("%c APP Bootstrap Error ", ["background: red", "color: white", "font-size: 11px"].join(";"));
+            keepconsole.error(e);
+            return !0;
+        }
+    }
+    ;
+    if (document.readyState == "complete") {
+        appBootstrapFn(document);
+    } else {
+        domReady(appBootstrapFn);
+    }
+
