@@ -1,5 +1,5 @@
 window.onload=function(){
-            var app = angular.module('testApp', []);
+            var app = angular.module('app', []);
             app.controller('testController', ['$scope', '$http', '$timeout',  function($scope, $http, $timeout) {
                 
 				var $ctrl = this;
@@ -67,3 +67,4 @@ window.onload=function(){
                 $scope.calculateTier($scope.months);
             }]);
         }
+	angular.bootstrap(document, ['app']);
