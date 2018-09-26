@@ -86,7 +86,6 @@ function domReady(fn) {
             angular.bootstrap(document, ['app'], {
                 strictDi: true
             });
-            return angular.resumeBootstrap();
         } catch (e) {
             var keepconsole = console;
             keepconsole.warn("%c APP Bootstrap Error ", ["background: red", "color: white", "font-size: 11px"].join(";"));
