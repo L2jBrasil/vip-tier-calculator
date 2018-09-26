@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Lineage 2 Classic Vip Tier Calculator</title>
+    <meta name="description" content="Simple tool to calculate your vip tier duration and renewal">
+    <meta name="author" content="Leonan Carvalho j.leonancarvalho at gmail.com">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script type="text/javascript" src="//stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <script type="application/javascript" src="app.js"></script>
+</head>
+<body>
+<div ng-app="testApp">
+    <!--
+      Bootstrap docs: https://getbootstrap.com/docs
+    -->
+    <div class="container">
+        <div class="row" ng-controller="testController">
+            <h1>
+                Lineage 2 Vip Tier Calculator <small>beta</small>
+            </h1>
+            <div class="article-p inner-container">
+                <form>
+                    <div class="row">
+                        <div class="col">
+                            NCoin:
+                            <input type="number" class="form-control" placeholder="NCoin Bulget" ng-model="ngCoin" ng-change="calculateTier()">
+                        </div>
+                        <div class="col">
+                            Month:
+                            <input type="number" class="form-control" placeholder="For how long Months?"  ng-model="months" min="1" ng-change="calculateTier()">
+                        </div>
+                    </div>
+                </form>
+                <h2>
+                    Result:
+                </h2>
+                <table border="1" cellpadding="1" cellspacing="1" class="table table-striped table-hover table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col">
+                            &nbsp;</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 1 VIP Status (80)</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 2 VIP Status (800)</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 3 VIP Status (2000) </th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 4 VIP Status (4000)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="row in calculatedTier">
+                        <td style="text-align: center;"><strong>Month {{row.month}}</strong></td>
+                        <!-- Tier 1 -->
+                        <td style="text-align: center;" ng-class="{'table-success': row.tiers[0].enabled,'table-danger': !row.tiers[0].enabled }">{{row.tiers[0].balance}}
+                            <br ng-if="!row.tiers[0].enabled">
+                            <small class="text-warn" ng-if="!row.tiers[0].enabled">
+                                You must buy more
+                                <i ng-if="row.tiers[0].balance > 0">{{row.tiers[0].required - row.tiers[0].balance}}</i>
+                                <i ng-if="row.tiers[0].balance <= 0">{{row.tiers[0].required}}</i>
+                                to reactivate
+                            </small>
+                        </td>
+                        <!-- Tier 2 -->
+                        <td style="text-align: center;" ng-class="{'table-success': row.tiers[1].enabled,'table-danger': !row.tiers[1].enabled }">
+                            {{row.tiers[1].balance}}
+                            <br ng-if="!row.tiers[1].enabled">
+                            <small class="text-warn" ng-if="!row.tiers[1].enabled">
+                                You must buy more
+                                <i ng-if="row.tiers[1].balance > 0">{{row.tiers[1].required - row.tiers[1].balance}}</i>
+                                <i ng-if="row.tiers[1].balance <= 0">{{row.tiers[1].required}}</i>
+                                to reactivate
+                            </small>
+                        </td>
+
+                        <!-- Tier 3 -->
+                        <td style="text-align: center;"  ng-class="{'table-success': row.tiers[2].enabled,'table-danger': !row.tiers[2].enabled }">
+                            {{row.tiers[2].balance}}
+                            <br ng-if="!row.tiers[2].enabled">
+                            <small class="text-warn" ng-if="!row.tiers[2].enabled">
+                                You must buy more
+                                <i ng-if="row.tiers[2].balance > 0">{{row.tiers[2].required - row.tiers[2].balance}}</i>
+                                <i ng-if="row.tiers[2].balance <= 0">{{row.tiers[2].required}}</i>
+                                to reactivate
+                            </small>
+                        </td>
+                        <!-- Tier 4 -->
+                        <td style="text-align: center;" ng-class="{'table-success': row.tiers[3].enabled,'table-danger': !row.tiers[3].enabled }">
+                            {{row.tiers[3].balance}}
+                            <br ng-if="!row.tiers[3].enabled">
+                            <small class="text-warn" ng-if="!row.tiers[3].enabled">
+                                You must buy more
+                                <i ng-if="row.tiers[3].balance > 0">{{row.tiers[3].required - row.tiers[3].balance}}</i>
+                                <i ng-if="row.tiers[3].balance <= 0">{{row.tiers[3].required}}</i>
+                                to reactivate
+                            </small>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                 <!-- <pre>{{calculatedTier|json}}</pre> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- info -->
+    <div class="container">
+        <div class="row">
+            <h2>
+                About the Vip Tier
+            </h2>
+            <div class="article-p inner-container">
+                <p class="MsoNormal">
+                    With the upcoming launch of <a href="https://classic.lineage2.com/">Lineage II Classic</a> on October 3, players who spend NCoin in the Lineage II Classic in-game store will automatically be entered into a new Classic VIP Program that offers additional benefits and bonuses on top of the base game, like bonus XP/SP, reduced XP loss on death, and a Daily Gift. Read on for details on how this program will work when it launches alongside Lineage II Classic!</p>
+                <p class="MsoNormal">
+                    &nbsp;</p>
+                <h2 class="MsoNormal">
+                    VIP Tiers</h2>
+                <p class="MsoNormal">
+                    There are four tiers within the Classic VIP Program, obtainable by spending NCoin on items in the Lineage II Classic in-game store. Your purchases will go towards VIP Points that are automatically applied and rank up your VIP tiers. The wide range of benefits you can enjoy by tier include:</p>
+                <p class="MsoNormal">
+                    &nbsp;</p>
+                <table border="1" cellpadding="1" cellspacing="1" style="width: 700px">
+                    <thead>
+                    <tr>
+                        <th scope="col" style="text-align: center;">
+                            <p>
+                                Benefits</p>
+                        </th>
+                        <th scope="col">
+                            <p>
+                                Tier 1 VIP Status</p>
+                        </th>
+                        <th scope="col">
+                            <p>
+                                Tier 2 VIP Status</p>
+                        </th>
+                        <th scope="col">
+                            <p>
+                                Tier 3 VIP Status</p>
+                        </th>
+                        <th scope="col">
+                            <p>
+                                Tier 4 VIP Status</p>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <p>
+                                XP/SP</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +5%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +10%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +15%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +25%</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                Item Drop</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +10%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +20%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +30%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +50%</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                Death Penalty Reduction (XP)</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                -5%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                -20%</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                VIP Daily Gift*</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                World Chat</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +1</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +2</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +2</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +3</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                Fishing XP</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +5%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +20%</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                Silver Coin Acquisition</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                ?</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                PVE Damage Increase</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                --</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +3%</p>
+                        </td>
+                        <td style="text-align: center;">
+                            <p>
+                                +10%</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="MsoNormal">
+                    &nbsp;</p>
+                <table align="center" border="1" cellpadding="1" cellspacing="1" style="width: 500px">
+                    <thead>
+                    <tr>
+                        <th colspan="2" scope="col" style="text-align: center;">
+                            <p>
+                                Daily Box Contents</p>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <p>
+                                <strong>Tier 1 VIP Status</strong></p>
+                        </td>
+                        <td>
+                            <p>
+                                1 Scroll of Escape<br>
+                                3 Healing Potions</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                <strong>Tier 2 VIP Status</strong></p>
+                        </td>
+                        <td>
+                            <p>
+                                1 Scroll of&nbsp; Resurrection<br>
+                                3 Healing Potions</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                <strong>Tier 3 VIP Status</strong></p>
+                        </td>
+                        <td>
+                            <p>
+                                1 Scroll of Escape<br>
+                                1 Scroll of Resurrection<br>
+                                5 Healing Potions</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>
+                                <strong>Tier 4 VIP Status</strong></p>
+                        </td>
+                        <td>
+                            <p>
+                                1 Scroll of Escape<br>
+                                1 Scroll of Resurrection<br>
+                                3 Major Healing Potions</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="MsoNormal">
+                    &nbsp;</p>
+                <h2 class="MsoNormal">
+                    VIP Points</h2>
+                <p class="MsoNormal">
+                    Every NCoin purchase you make will automatically go towards your VIP Points. 1 NCoin = 1 VIP Point. Each VIP tier can be achieved by accumulating the required number of VIP Points, but your tier can also decrease.</p>
+                <table border="1" cellpadding="1" cellspacing="1" style="width: 700px">
+                    <thead>
+                    <tr>
+                        <th scope="col">
+                            &nbsp;</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 1 VIP Status</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 2 VIP Status</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 3 VIP Status</th>
+                        <th scope="col" style="text-align: center;">
+                            Tier 4 VIP Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong>Points Required</strong></td>
+                        <td style="text-align: center;">
+                            80</td>
+                        <td style="text-align: center;">
+                            800</td>
+                        <td style="text-align: center;">
+                            2000</td>
+                        <td style="text-align: center;">
+                            4000</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Points Depreciated*</strong></td>
+                        <td style="text-align: center;">
+                            80</td>
+                        <td style="text-align: center;">
+                            400</td>
+                        <td style="text-align: center;">
+                            660</td>
+                        <td style="text-align: center;">
+                            1320</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <address class="MsoNormal">
+                    *After 30 days, these points will expire depending on the VIP tier.</address>
+                <p class="MsoNormal">
+                    Once a VIP tier is obtained, you reap the benefits for 30 days. Should your VIP tier change any time during your 30 days, you can enjoy your new tier benefits for 30 days from when you reached that level. There is no limit to how many VIP Points you earn, but VIP Points will depreciate every 30 days, and that can affect your VIP tier. If you want to maintain your VIP tier, be sure to at least obtain the amount of VIP Points that will be depreciating after the 30 days.</p>
+                <p class="MsoNormal">
+                    &nbsp;</p>
+                <p class="MsoNormal">
+                    The VIP Rewards Program tiers and benefits are subject to change. The reward program will be occasionally updated to ensure theyӲe continually relevant and valuable.</p>
+                <p></p>
+
+            </div>
+        </div>
+    </div>
+</div>
+<footer> Developed by <a href="https://discord.gg/kq2qrWh" target="_blank">L2jBrasil</a> This site is hosted in cortesy of L2jCenter </footer>
+
+</body>
+</html>
