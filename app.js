@@ -66,5 +66,5 @@ window.onload=function(){
                 //Init:
                 $scope.calculateTier($scope.months);
             }]);
+	    angular.bootstrap(document, ['app']);
         }
-	angular.bootstrap(document, ['app']);
