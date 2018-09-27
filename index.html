@@ -22,27 +22,67 @@
       Bootstrap docs: https://getbootstrap.com/docs
     -->
     <div class="container">
-        <div class="row" ng-controller="testController">
-            <h1>
+	 <h1>
                 Lineage 2 Vip Tier Calculator <small>beta</small>
             </h1>
-            <div class="article-p inner-container">
-                <form>
-                    <div class="row">
+        <div class="row" ng-controller="testController">
+           <div class="col-md-12">
+		   <form>
+			 <!-- <h3>What you want to know?</h3>
+			  <div class="custom-control custom-radio">
+				<input type="radio" class="custom-control-input" id="customControlValidation2" name="radio-stacked" ng-model="mode" ng-value="1" required>
+				<label class="custom-control-label" for="customControlValidation2">What will the duration of vip be if I buy?</label>
+			  </div>
+			  <div class="custom-control custom-radio mb-3">
+				<input type="radio" class="custom-control-input" id="customControlValidation3" name="radio-stacked" ng-model="mode" ng-value="2" required>
+				<label class="custom-control-label" for="customControlValidation3">Or what quantity will I need to buy to be a VIP for a few months?</label>
+			  </div>
+
+			 
+			   <div class="form-group" ng-show="mode==1">
+				<div class="row">
                         <div class="col">
-                            NCoin:
+                            <a href="http://www.lineage2.com/en/shop/ncoin/" target="_blank">NCoin Bulget</a>
                             <input type="number" class="form-control" placeholder="NCoin Bulget" ng-model="ngCoin" ng-change="calculateTier()">
                         </div>
                         <div class="col">
-                            Month:
+                            For how long Months?
                             <input type="number" class="form-control" placeholder="For how long Months?"  ng-model="months" min="1" ng-change="calculateTier()">
                         </div>
                     </div>
-                </form>
+			   </div> -->
+			   
+			   <div class="form-group" ng-show="mode==2">
+				<div class="row">
+                        <div class="col">
+							Pick a vip tier
+                            <select class="custom-select"  ng-options="item as item.name for item in vipTiers track by item.name" ng-model="selected" ng-change="calculateNcoin()" required>
+							  <option value="" selected disabled>Pick a vip tier</option>
+							</select>
+                        </div>
+                        <div class="col">
+                            For how long Months?
+                            <input type="number" class="form-control" placeholder="For how long Months?"  ng-model="months" min="1"  ng-change="calculateNcoin()" >
+                        </div>
+                    </div>
+			   </div>
+			  
+			  
+			</form>
+			</div>
+            <div class="col-md-12" ng-if="mode==1" >
                 <h2>
                     Result:
                 </h2>
-                <table border="1" cellpadding="1" cellspacing="1" class="table table-striped table-hover table-responsive">
+				
+				<div class="row" >
+					<div class="pull-right" >
+						<small class="table-success" style="width:32px;height:32px;" > on</small>
+						<small class="table-danger" style="width:32px;height:32px;"> off</small>	
+					</div>					
+				</div>
+				<div class="row" >
+                <table cellpadding="1" cellspacing="1" class="table table-striped table-hover table-responsive">
                     <thead>
                     <tr>
                         <th scope="col">
@@ -90,7 +130,7 @@
                                 You must buy more
                                 <i ng-if="row.tiers[2].balance > 0">{{row.tiers[2].required - row.tiers[2].balance}}</i>
                                 <i ng-if="row.tiers[2].balance <= 0">{{row.tiers[2].required}}</i>
-                                to reactivate
+                                to enable this tier
                             </small>
                         </td>
                         <!-- Tier 4 -->
@@ -101,22 +141,67 @@
                                 You must buy more
                                 <i ng-if="row.tiers[3].balance > 0">{{row.tiers[3].required - row.tiers[3].balance}}</i>
                                 <i ng-if="row.tiers[3].balance <= 0">{{row.tiers[3].required}}</i>
-                                to reactivate
+                                to enable this tier
                             </small>
                         </td>
                     </tr>
                     </tbody>
                 </table>
+				</div>
                  <!-- <pre>{{calculatedTier|json}}</pre> -->
             </div>
-        </div>
+			<div class="col-md-12" ng-if="mode == 2 && calculatedNcoin.length > 0" >
+				<h2>
+                    Result for  {{selected.name}} ( {{selected.required}}) in  {{months}} month(s) <small>({{months*30}} days)</small>: 
+                </h2>
+				<div class="row">
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item">Total NCoins purchases in period <span class="text-info">{{totalBalance}}</span> </li>
+					<li class="list-group-item">Total VIP depreciated in period <span class="text-danger">{{totalDepreciated}}</span> </li>
+					<li class="list-group-item">Total Real Money spend in period <span class="text-success">$ {{totalRM}}</span> </li>
+				</ul>
+				
+                <table cellpadding="1" cellspacing="1" class="table table-striped table-hover table-responsive ">
+                    <thead>
+                    <tr>
+                        <th scope="col">Day</th>
+						<th scope="col">VIP Points</th>
+                        <th scope="col" style="text-align: center;">How many NCoin should be Purchased?</th>
+						<th scope="col" style="text-align: center;">Which <a href="http://www.lineage2.com/en/shop/ncoin/" target="_blank"> package available </a> should I buy?</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="row in calculatedNcoin">
+                        <th scope="row"><strong>{{row.month}}</strong></th>
+						<td style="text-align: center;">{{row.vip}}</td>
+                        <td style="text-align: center;">
+							{{row.purchace}}
+							<strong ng-if="$last">  </strong>
+						</td>
+						<td style="text-align: center;">
+							<!--<pre>{{row.packs|json}}</pre>-->
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item" ng-repeat="pack in row.packs.packs">
+								{{pack.amount}} ($ {{pack.price}})
+								</li>
+							</ul>
+							<small ng-if="row.packs.total > 0">sub-total ($ {{row.packs.total}})</small>	
+							<h1 ng-if="row.packs.total == 0">-</h1>						
+						</td>
+                    </tr>
+                    </tbody>
+                </table>
+			<!--	<pre>{{calculatedNcoin|json}}</pre>-->
+				</div>
+			</div>
+		</div>
     </div>
 
-    <!-- info -->
+    <!-- Content from -->
     <div class="container">
         <div class="row">
             <h2>
-                About the Vip Tier
+                About the <a href="https://www.lineage2.com/en/news/announcements/classic-vip-rewards-program.php" target="_blank" > Vip Tier </a>
             </h2>
             <div class="article-p inner-container">
                 <p class="MsoNormal">
@@ -445,18 +530,24 @@
                     *After 30 days, these points will expire depending on the VIP tier.</address>
                 <p class="MsoNormal">
                     Once a VIP tier is obtained, you reap the benefits for 30 days. Should your VIP tier change any time during your 30 days, you can enjoy your new tier benefits for 30 days from when you reached that level. There is no limit to how many VIP Points you earn, but VIP Points will depreciate every 30 days, and that can affect your VIP tier. If you want to maintain your VIP tier, be sure to at least obtain the amount of VIP Points that will be depreciating after the 30 days.</p>
+                <p class="MsoNormal">                    &nbsp;</p>
                 <p class="MsoNormal">
-                    &nbsp;</p>
-                <p class="MsoNormal">
-                    The VIP Rewards Program tiers and benefits are subject to change. The reward program will be occasionally updated to ensure theyӲe continually relevant and valuable.</p>
+                    The VIP Rewards Program tiers and benefits are subject to change. The reward program will be occasionally updated to ensure they're continually relevant and valuable.</p>
                 <p></p>
 
             </div>
         </div>
     </div>
 </div>
-<footer> Developed by <a href="https://discord.gg/kq2qrWh" target="_blank">L2jBrasil</a> This site is hosted in cortesy of L2jCenter </footer>
+<footer> 
+Developed by <a href="https://discord.gg/kq2qrWh" target="_blank">L2jBrasil Developers </a>
+
+         <small id="copyright" class="text-center">
+            <p>© 2004-2017 NCSOFT Corporation. All rights reserved.<br>
+            Lineage II, PLAYNC, NCSOFT, the Interlocking NC Logo and all associated logos and designs are trademarks or registered trademarks of NCSOFT Corporation.<br>All other trademarks or registered trademarks are property of their respective owners.</p>
+        </small>
+</footer>
 <a href="https://github.com/L2jBrasil/vip-tier-calculator"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>   
-    <script type="application/javascript" src="app.js?v=nocache" async></script>
+    <script type="application/javascript" src="app.js?v=27" async nocache></script>
     </body>
 </html>
