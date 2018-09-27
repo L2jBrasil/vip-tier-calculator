@@ -65,6 +65,12 @@
                             <input type="number" class="form-control" placeholder="For how long Months?"  ng-model="months" min="1"  ng-change="calculateNcoin()" >
                         </div>
                     </div>
+				<div class="">
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input" id="customControlValidation2" name="checkbox-optimized" ng-model="optimized" ng-true-value="!0"       ng-false-value="!!0">
+						<label class="custom-control-label" for="customControlValidation2">Show optimized suggestion for packs? <small>(experimental)</small></label>
+					</div>
+				</div>
 			   </div>
 			  
 			  
@@ -159,15 +165,18 @@
 					<li class="list-group-item">Total NCoins purchases in period <span class="text-info">{{totalBalance}}</span> </li>
 					<li class="list-group-item">Total VIP depreciated in period <span class="text-danger">{{totalDepreciated}}</span> </li>
 					<li class="list-group-item">Total Real Money spend in period <span class="text-success">$ {{totalRM}}</span> </li>
+					<li class="list-group-item" ng-if="optimized">Total Real Money spend in period for optmized packs <span class="text-success">$ {{totalRMBestPack}}</span> </li>
 				</ul>
 				
                 <table cellpadding="1" cellspacing="1" class="table table-striped table-hover table-responsive ">
                     <thead>
                     <tr>
-                        <th scope="col">Day</th>
+                        <th scope="col">Month</th>
 						<th scope="col">VIP Points</th>
                         <th scope="col" style="text-align: center;">How many NCoin should be Purchased?</th>
-						<th scope="col" style="text-align: center;">Which <a href="http://www.lineage2.com/en/shop/ncoin/" target="_blank"> package available </a> should I buy?</th>
+						<th scope="col" style="text-align: center;">Which <a href="http://www.lineage2.com/en/shop/ncoin/" target="_blank"> single package available </a> should I buy?</th>
+						<th scope="col" style="text-align: center;" ng-if="optimized"> Optimized balance </th>
+						<th scope="col" style="text-align: center;" ng-if="optimized"> Maybe this <a href="http://www.lineage2.com/en/shop/ncoin/" target="_blank"> single package available </a> is better</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -181,12 +190,24 @@
 						<td style="text-align: center;">
 							<!--<pre>{{row.packs|json}}</pre>-->
 							<ul class="list-group list-group-flush">
-								<li class="list-group-item" ng-repeat="pack in row.packs.packs">
+								<li class="list-group-item" ng-repeat="pack in row.packs.packs  track by $index">
 								{{pack.amount}} ($ {{pack.price}})
 								</li>
 							</ul>
-							<small ng-if="row.packs.total > 0">sub-total ($ {{row.packs.total}})</small>	
+							<small  class="text-info"  ng-if="row.packs.total > 0">sub-total ($ {{row.packs.total}})</small>	
 							<h1 ng-if="row.packs.total == 0">-</h1>						
+						</td>
+						<!-- optmized option -->
+						<td scope="col" style="text-align: center;" ng-if="optimized">{{row.bestbalance}}</td>
+						<td style="text-align: center;"  ng-if="optimized">
+							<!--<pre>{{row.packs|json}}</pre>-->
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item" ng-repeat="pack in row.bestpacks.packs track by $index">
+								{{pack.amount}} ($ {{pack.price}})
+								</li>
+							</ul>
+							<small  class="text-info" ng-if="row.bestpacks.total > 0">sub-total ($ {{row.bestpacks.total}})</small>	
+							<h1 ng-if="row.bestpacks.total == 0">-</h1>						
 						</td>
                     </tr>
                     </tbody>
@@ -540,14 +561,16 @@
     </div>
 </div>
 <footer> 
-Developed by <a href="https://discord.gg/kq2qrWh" target="_blank">L2jBrasil Developers </a>
+Developed by <a href="https://forums.lineage2.com/profile/9442-grundor/" target="_blank">Grundor </a>
 
          <small id="copyright" class="text-center">
             <p>© 2004-2017 NCSOFT Corporation. All rights reserved.<br>
             Lineage II, PLAYNC, NCSOFT, the Interlocking NC Logo and all associated logos and designs are trademarks or registered trademarks of NCSOFT Corporation.<br>All other trademarks or registered trademarks are property of their respective owners.</p>
         </small>
 </footer>
-<a href="https://github.com/L2jBrasil/vip-tier-calculator"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>   
-    <script type="application/javascript" src="app.js?v=27" async nocache></script>
+<a href="https://github.com/L2jBrasil/vip-tier-calculator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+
+
+    <script type="application/javascript" src="app.js?v=42" async nocache></script>
     </body>
 </html>

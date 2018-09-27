@@ -3,6 +3,13 @@ var app = angular.module('app', []);
                 
 				var $ctrl = this;
 				
+							
+				
+				$scope.mode = 2;
+                $scope.ngCoin = 80;
+                $scope.months = 2;
+				$scope.optimized = false;
+				
                 $scope.vipTiers = [
                     {"name": "Tier 1 VIP Status", required:80, depreciated: 80},
                     {"name": "Tier 2 VIP Status", required:800, depreciated: 400},
@@ -45,9 +52,49 @@ var app = angular.module('app', []);
 					return best;					
 				};
 				
-				$scope.mode = 2;
-                $scope.ngCoin = 80;
-                $scope.months = 2;
+				$scope.getBestPackagesByLowerstPrice  = function getBestPackagesByLowerstPrice(ncoin){
+					var packs = [];
+					var lowerprice = null;
+					var bestPack = null;
+					for(var i in $scope.ncoinPackages){
+						var pack = $scope.ncoinPackages[i];
+						packs[i] = [];
+						var needed = ncoin;
+						var total = 0;
+						
+						while(needed > 0){
+							total =  total  + pack.price; //LowerstPrice
+							packs[i].push(pack);
+							needed = needed - pack.amount;
+						}						
+						
+						if(lowerprice == null || lowerprice >=   total){
+							if(lowerprice == total){
+								var currentBest = packs[bestPack];
+								if(currentBest.length >  packs[i].length){
+									lowerprice = total;
+									bestPack = i;
+								}
+							
+							}else{
+								lowerprice = total;
+								bestPack = i;
+							}
+							
+						}
+					} 
+					
+					var best = {total: 0, totalncoin: 0, packs: []};
+					for(var i in  packs[bestPack]){
+						var p =  packs[bestPack][i];
+						best.total  = best.total + p.price; //Total Real money
+						best.totalncoin = best.totalncoin + p.amount; //Total ncoin
+						best.packs.push(p);
+					}
+					
+					
+					return best;//if is greater return  the last
+				};
 
 
                 $scope.calculateTier = function calculateTier(){
@@ -104,6 +151,7 @@ var app = angular.module('app', []);
 					var tier = angular.copy( $scope.selected ) ;
 					$scope.totalBalance =   0; //Initial Balance
 					$scope.totalRM = 0;
+					$scope.totalRMBestPack = 0;
 					$scope.totalDepreciated = (($scope.months - 1)*tier.depreciated);
 					
 					$scope.calculatedNcoin = [];
@@ -115,7 +163,9 @@ var app = angular.module('app', []);
                                 purchace: 0,
 								vip: 0,
 								balance:0,
-								packs: null
+								packs: null,
+								bestpacks: null,
+								bestbalance: 0
                         };
 						
 						if(m==1){
@@ -124,6 +174,12 @@ var app = angular.module('app', []);
 							calculatedMonth.purchace  = tier.required;
 							calculatedMonth.balance  = calculatedMonth.packs.totalncoin;
 							$scope.totalRM = calculatedMonth.packs.total;
+							
+							//Best pack calc
+							calculatedMonth.bestpacks = $scope.getBestPackagesByLowerstPrice(tier.required);
+							$scope.totalRMBestPack = calculatedMonth.bestpacks.total;
+							calculatedMonth.bestbalance = calculatedMonth.bestpacks.totalncoin
+							
 						}else{
 							var c = $scope.calculatedNcoin.length;
 							var balance = $scope.calculatedNcoin[c-1].balance -  tier.depreciated; //Current balance aready less the current depreciated
@@ -142,10 +198,28 @@ var app = angular.module('app', []);
 							
 							$scope.totalBalance  = $scope.totalBalance + calculatedMonth.purchace;
 							$scope.totalRM = $scope.totalRM + calculatedMonth.packs.total;
+							
+							
+							//Another approach is calculate the optimized packs to fill the tier. 
+							//Calculate based on bestpack:
+							var currentBalance = $scope.calculatedNcoin[c-1].bestbalance; //Current balance for this month
+							if(currentBalance  >=  tier.required){ //You have enough to keep the tier next month
+								calculatedMonth.bestpacks = {total: 0, totalncoin: 0, packs: []}; //You do not need to buy nothing else
+								calculatedMonth.bestbalance =  currentBalance - tier.required
+							}else{
+								var howMuchShouldBuy = tier.required - currentBalance;
+								calculatedMonth.bestpacks = $scope.getBestPackagesByLowerstPrice(howMuchShouldBuy);								
+								calculatedMonth.bestbalance = calculatedMonth.bestpacks.totalncoin;					
+							}
+							$scope.totalRMBestPack = $scope.totalRMBestPack + calculatedMonth.bestpacks.total; //update real money spend with best packs
+							
 						}
+						
+						
 						
 						$scope.calculatedNcoin.push(calculatedMonth);
 					}
+					console.info("Calculated Coins",$scope.calculatedNcoin);
 				};
             }]);
 
